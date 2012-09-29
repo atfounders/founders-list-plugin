@@ -42,7 +42,7 @@ function fl_custom_content_types() {
 		'has_archive' => true, 
 		'hierarchical' => false,
 		'menu_position' => null,
-		'supports' => array( 'title', 'editor', 'thumbnail', 'excerpt' )
+		'supports' => array( 'title' )
 	);
 	register_post_type( 'fl_person', $person_args );
 	
@@ -104,4 +104,95 @@ function fl_remove_dashboard_widgets() {
 	remove_meta_box( 'dashboard_recent_drafts', 'dashboard', 'side' );
 	remove_meta_box( 'dashboard_primary', 'dashboard', 'side' );
 	remove_meta_box( 'dashboard_secondary', 'dashboard', 'side' );
+}
+
+
+/**
+ * Add our own custom metaboxes.
+ */
+add_filter( 'cmb_meta_boxes', 'fl_cmb_meta_boxes' );
+
+function fl_cmb_meta_boxes() {
+	
+	$prefix = '_fl_';
+	
+	$meta_boxes[] = array(
+			'id'         => 'fl_people_meta_box',
+			'title'      => 'Contact Information',
+			'pages'      => array( 'fl_person', ), // Post type
+			'context'    => 'normal',
+			'priority'   => 'high',
+			'show_names' => true, // Show field names on the left
+			'fields'     => array(
+				array(
+					'name' => 'Email',
+					'desc' => '',
+					'id'   => $prefix . 'email_address',
+					'type' => 'text_medium',
+				),
+				array(
+					'name' => 'Website',
+					'desc' => 'Full address, ex: http://google.com',
+					'id'   => $prefix . 'website_url',
+					'type' => 'text_medium',
+				),
+				array(
+					'name' => 'Twitter',
+					'desc' => 'Full address to Twitter, ex: http://twitter.com/founders',
+					'id'   => $prefix . 'twitter_url',
+					'type' => 'text_medium',
+				),
+				array(
+					'name' => 'Facebook',
+					'desc' => 'Full Facebook address',
+					'id'   => $prefix . 'facebook_url',
+					'type' => 'text_medium',
+				),
+				array(
+					'name' => 'Founders',
+					'desc' => 'Founders profile, ex: http://chat.atfounders.com/author/ryanimel',
+					'id'   => $prefix . 'founders_url',
+					'type' => 'text_medium',
+				),
+				array(
+					'name' => 'Recommended by',
+					'desc' => 'Who recommends this person? Everyone on this list should be.',
+					'id'   => $prefix . 'recommended_by',
+					'type' => 'text_medium',
+				),
+			),
+		);
+
+		$meta_boxes[] = array(
+			'id'         => 'about_page_metabox',
+			'title'      => 'About Page Metabox',
+			'pages'      => array( 'page', ), // Post type
+			'context'    => 'normal',
+			'priority'   => 'high',
+			'show_names' => true, // Show field names on the left
+			'show_on'    => array( 'key' => 'id', 'value' => array( 2, ), ), // Specific post IDs to display this metabox
+			'fields' => array(
+				array(
+					'name' => 'Test Text',
+					'desc' => 'field description (optional)',
+					'id'   => $prefix . 'test_text',
+					'type' => 'text',
+				),
+			)
+		);
+
+		return $meta_boxes;	
+}
+
+
+/**
+ * Initialize the metabox class.
+ */
+add_action( 'init', 'cmb_initialize_cmb_meta_boxes', 9999 );
+
+function cmb_initialize_cmb_meta_boxes() {
+
+	if ( ! class_exists( 'cmb_Meta_Box' ) )
+		require_once 'metabox/init.php';
+
 }
